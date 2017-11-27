@@ -1,9 +1,9 @@
 provider "aws" {
-  region = "eu-central-1"
+  region = "ap-southeast-2"
 }
 
 resource "aws_s3_bucket" "ec2-status-bucket" {
-  bucket = "ec2-status-bucket"
+  bucket_prefix = "ec2-status-bucket"
   acl    = "private"
   versioning = 	{
            enabled = true
@@ -113,18 +113,37 @@ EOF
 
 }
 
-
-resource "aws_instance" "vini_ec2" {
+resource "aws_launch_configuration" "terra_lc" {
+  name_prefix = "terraform-lc-example-"
+  image_id = "${data.aws_ami.myimage.image_id}"
   instance_type = "t2.micro"
   key_name = "aws-vinitha"
-  ami = "${data.aws_ami.myimage.image_id}"
-  tags = {
-     Name = "TerraformEC2"
-  }
   user_data = "${data.template_file.user_data_template.rendered}"
   iam_instance_profile = "${aws_iam_instance_profile.s3_access_profile.name}"
-
 }
+
+
+
+resource "aws_autoscaling_group" "terraform_group" {
+  availability_zones        = ["ap-southeast-2a"]
+  name                      = "terraform-instance"
+  max_size                  = 1
+  min_size                  = 1
+  launch_configuration      = "${aws_launch_configuration.terra_lc.name}"
+}
+
+
+#resource "aws_instance" "vini_ec2" {
+#  instance_type = "t2.micro"
+#  key_name = "aws-vinitha"
+#  ami = "${data.aws_ami.myimage.image_id}"
+#  tags = {
+#     Name = "TerraformEC2"
+#  }
+#  user_data = "${data.template_file.user_data_template.rendered}"
+#  iam_instance_profile = "${aws_iam_instance_profile.s3_access_profile.name}"
+
+#}
 
 
 output "bucket_arn" {
