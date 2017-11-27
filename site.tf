@@ -117,12 +117,9 @@ resource "aws_launch_configuration" "terra_lc" {
   name_prefix = "terraform-lc-example-"
   image_id = "${data.aws_ami.myimage.image_id}"
   instance_type = "t2.micro"
-  key_name = "aws-vinitha"
   user_data = "${data.template_file.user_data_template.rendered}"
   iam_instance_profile = "${aws_iam_instance_profile.s3_access_profile.name}"
 }
-
-
 
 resource "aws_autoscaling_group" "terraform_group" {
   availability_zones        = ["ap-southeast-2a"]
@@ -131,20 +128,6 @@ resource "aws_autoscaling_group" "terraform_group" {
   min_size                  = 1
   launch_configuration      = "${aws_launch_configuration.terra_lc.name}"
 }
-
-
-#resource "aws_instance" "vini_ec2" {
-#  instance_type = "t2.micro"
-#  key_name = "aws-vinitha"
-#  ami = "${data.aws_ami.myimage.image_id}"
-#  tags = {
-#     Name = "TerraformEC2"
-#  }
-#  user_data = "${data.template_file.user_data_template.rendered}"
-#  iam_instance_profile = "${aws_iam_instance_profile.s3_access_profile.name}"
-
-#}
-
 
 output "bucket_arn" {
   value = "${aws_s3_bucket.ec2-status-bucket.arn}"
