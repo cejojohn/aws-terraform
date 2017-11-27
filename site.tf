@@ -84,14 +84,31 @@ apt-get update
 apt-get install -y python python-pip
 pip install awscli
 
-echo -e "File with instance metadata\n" >> instance_metadata_file.txt
+echo "<html>
+      <body>
+      <h2>
+      <center>
+      Metadata file in S3
+      </h2>
+      </center>
+      <br><br>
+      " >> instance_metadata_file.html
 
+echo "<h4>The EC2 instance metadata:</h4> <ul>" >> instance_metadata_file.html
 for metadata in {local-hostname,instance-type,ami-id}
-do
- curl  http://169.254.169.254/latest/meta-data/$metadata >> instance_metadata_file.txt
- echo ""  >> instance_metadata_file.txt
+do	
+ echo "<li>" >> instance_metadata_file.html
+ curl  http://169.254.169.254/latest/meta-data/$metadata >> instance_metadata_file.html
+ echo "</li>" >> instance_metadata_file.html
 done
-aws s3 cp /instance_metadata_file.txt  s3://${aws_s3_bucket.ec2-status-bucket.id}/
+echo "</ul>" >> instance_metadata_file.html
+
+date +"<br><br><i>This file was generated on %dth %b %Y at %T hrs %Z</i>"   >> instance_metadata_file.html
+
+echo "</body>
+      </html>" >> instance_metadata_file.html
+
+aws s3 cp /instance_metadata_file.html  s3://${aws_s3_bucket.ec2-status-bucket.id}/
 EOF
 
 }
