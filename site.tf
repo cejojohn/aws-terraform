@@ -8,7 +8,7 @@ provider "aws" {
   region = "ap-southeast-2"
 }
 
-resource "aws_s3_bucket" "ec2-status-bucket" {
+resource "aws_s3_bucket" "ec2_status_bucket" {
   bucket_prefix = "${var.bucket_name}"
   acl    = "private"
   versioning = 	{
@@ -26,7 +26,7 @@ resource "aws_iam_role_policy" "s3_access_policy" {
     {
       "Effect": "Allow",
       "Action": ["s3:ListBucket"],
-      "Resource": ["${aws_s3_bucket.ec2-status-bucket.arn}"]
+      "Resource": ["${aws_s3_bucket.ec2_status_bucket.arn}"]
     },
     {
       "Effect": "Allow",
@@ -35,7 +35,7 @@ resource "aws_iam_role_policy" "s3_access_policy" {
         "s3:GetObject",
         "s3:DeleteObject"
       ],
-      "Resource": ["${aws_s3_bucket.ec2-status-bucket.arn}/*"]
+      "Resource": ["${aws_s3_bucket.ec2_status_bucket.arn}/*"]
     }
   ]
 }
@@ -114,7 +114,7 @@ date +"<br><br><i>This file was generated on %dth %b %Y at %T hrs %Z</i>"   >> i
 echo "</body>
       </html>" >> instance_metadata_file.html
 
-aws s3 cp /instance_metadata_file.html  s3://${aws_s3_bucket.ec2-status-bucket.id}/
+aws s3 cp /instance_metadata_file.html  s3://${aws_s3_bucket.ec2_status_bucket.id}/
 EOF
 
 }
@@ -136,5 +136,5 @@ resource "aws_autoscaling_group" "terraform_group" {
 }
 
 output "bucket_arn" {
-  value = "${aws_s3_bucket.ec2-status-bucket.arn}"
+  value = "${aws_s3_bucket.ec2_status_bucket.arn}"
 }
